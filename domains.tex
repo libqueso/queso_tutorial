@@ -1,0 +1,36 @@
+\section{Parameter domains}
+\begin{frame}[fragile]{Parameter domains}
+  \begin{itemize}
+    \item Random variables are defined on a `state space' or `domain'.
+    \item State space may be a proper subset of the whole vector space
+      \texttt{paramSpace}.
+    \item Most domains are boxes.
+    \item More exotic domains are not supported out of the box.
+    \item Creating your own will not be covered here.
+  \end{itemize}
+  \begin{verbatim}
+QUESO::GslVector paramMins(paramSpace.zeroVector());
+QUESO::GslVector paramMaxs(paramSpace.zeroVector());
+paramMins.cwSet(0.0);
+paramMaxs.cwSet(1.0);
+
+QUESO::BoxSubset<> paramDomain("param_", paramSpace,
+                               paramMins, paramMaxs);
+  \end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Parameter domains}
+  \begin{verbatim}
+QUESO::BoxSubset<> paramDomain("param_", paramSpace,
+                               paramMins, paramMaxs);
+  \end{verbatim}
+  Arguments are:
+  \begin{enumerate}
+    \item Prefix for input file entries.
+    \item The underlying vector space that elements of the domain belong to.
+    \item A vector of the minimum values in each dimension.
+    \item A vector of the maximum values in each dimension.
+  \end{enumerate}
+  \textbf{Note:} Passing \texttt{INFINITY} (\texttt{-INFINITY}) as the maximum
+  (minimum) of the domain limits is allowed.
+\end{frame}

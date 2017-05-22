@@ -1,0 +1,67 @@
+\section{Statistical inverse problem}
+\begin{frame}[fragile]{Statistical inverse problem}
+  \begin{itemize}
+    \item So far, have created a prior
+    \item Have created a likelihood
+    \item We will now from the statistical inverse problem
+    \item \Queso\ will solve the statistical inverse problem
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Statistical inverse problem}
+  Create a posterior random variable (on the same domain):
+  \begin{verbatim}
+QUESO::GenericVectorRV<> postRv("post_", paramSpace); \end{verbatim}
+  Create a statistical inverse problem with the prior, likelihood and
+  posterior:
+  \begin{verbatim}
+QUESO::StatisticalInverseProblem<> ip("", NULL,
+                                      priorRv,
+                                      lhood, postRv); \end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Statistical inverse problem}
+  Before we solve the problem we have to tell \Queso\ what the first sample in
+  the chain is:
+  \begin{verbatim}
+QUESO::GslVector paramInitials(paramSpace.zeroVector());
+paramInitials[0] = 1.0;
+paramInitials[1] = 1.0; \end{verbatim}
+  And we also have to tell \Queso\ the variance of the proposal distribution:
+  \begin{verbatim}
+QUESO::GslMatrix propCovMatrix(paramSpace.zeroVector());
+propCovMatrix(0, 0) = 0.0001;
+propCovMatrix(1, 1) = 0.0001; \end{verbatim}
+  These are algorithmic knobs, and there are efforts to remove this necessity
+  in future and start with sensible defaults.  For now, though, we have to set
+  these.
+\end{frame}
+
+\begin{frame}[fragile]{Statistical inverse problem}
+  Now solve and tidy up:
+  \begin{verbatim}
+  ip.solveWithBayesMetropolisHastings(NULL, paramInitials,
+                                      &propCovMatrix);
+  MPI_Finalize();
+  return 0;
+} \end{verbatim}
+\end{frame}
+
+\section{Task 5}
+\begin{frame}[fragile]{Task 5}
+  \begin{itemize}
+    \item Compile and run the code.  Output will be in the \texttt{outputData} directory
+    \item Samples are stored in the \texttt{ip\_raw\_chain\_.m} file as a
+      \texttt{matlab} vector
+    \item The first column are samples of the first parameter
+      (\texttt{domainVector[0]}).  The second column are samples of the second
+      parameter (\texttt{domainVector[1]})
+    \item Matlab output is a hinderance (not open source).  There are efforts
+      to output an HDF5 file in future.  Initial support exists but is not
+      usable at present
+    \item Use script to plot the samples to a PDF file.
+    \item The truth is $(D, \beta) = (0.197, 1.75)$.
+    \item Plot the running mean and variance of the samples.  What do you get?
+    \item This task should take less than twenty minutes.
+  \end{itemize}
+\end{frame}

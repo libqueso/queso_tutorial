@@ -1,0 +1,69 @@
+\section{Random variables}
+\begin{frame}[fragile]{Random variables}
+  \begin{itemize}
+    \item \Queso\ supports the following random variables:
+      \begin{itemize}
+        \item Inverse Gamma
+        \item Jeffreys
+        \item Log Normal
+        \item Beta
+        \item Gamma
+        \item Gaussian
+        \item Uniform
+        \item Wigner
+      \end{itemize}
+    \item \Queso also supports creating custom random variables.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Random variables}
+  \begin{itemize}
+    \item Random variables need the domain, and possibly other parameters
+    \item Uniform:
+      \begin{verbatim}
+QUESO::UniformVectorRV<> priorRv("prior_", paramDomain); \end{verbatim}
+    \item Beta needs a vector of $\alpha$ and $\beta$ parameters as well:
+      \begin{verbatim}
+QUESO::BetaVectorRV<> betaRv("prior_", paramDomain,
+                             alphas, betas);\end{verbatim}
+    \item Gaussians need a mean and covariance:
+      \begin{verbatim}
+QUESO::GaussianVectorRV<> gaussianRv("prior_",
+                                     paramDomain, mean,
+                                     cov); \end{verbatim}
+    \item Unless it's obvious how to correlated elements of the vector, they
+      are assumed to be independent.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Random variables}
+  \begin{itemize}
+    \item \texttt{*VectorRV} classes have two major components:
+      \begin{itemize}
+        \item A \texttt{*JointPdf} object to evaluate the underlying density.
+        \item A \texttt{*VectorRealizer} component to draw realisations.
+      \end{itemize}
+    \item You can access these components with the \texttt{pdf()} method\ldots
+      \begin{verbatim}
+QUESO::GslVector point(paramSpace.zeroVector());
+betaRv.pdf().actualValue(point, NULL, NULL, NULL,
+                         NULL); \end{verbatim}
+    \item \ldots or the \texttt{realizer()} method
+      \begin{verbatim}
+QUESO::GslVector draw(paramSpace.zeroVector());
+betaRv.realizer().realization(draw); \end{verbatim}
+  \end{itemize}
+\end{frame}
+
+\section{Task 3}
+\begin{frame}[fragile]{Task 3}
+  \begin{enumerate}
+    \item Create a Guassian random variable over some domain.
+    \item Think about your domain for a few minutes.
+    \item Compute (and print) the empirical mean and variance (see point 2.)
+      from $10^6$ realisations.
+    \item Are they (approximately) what you expect them to be?  If not, why
+      not?
+    \item This task should take less than fifteen minutes.
+  \end{enumerate}
+\end{frame}

@@ -1,0 +1,47 @@
+\section{The environment}
+\begin{frame}[fragile]{The environment}
+  \begin{itemize}
+    \item All classes are available in the \texttt{QUESO} namespace.
+    \item Most of the objects in \Queso\ need an \emph{environment}.
+    \item Some objects can infer it from other objects.
+    \item Lives in \texttt{queso/Enivornment.h} and called \texttt{FullEnvironment}.
+  \end{itemize}
+  \begin{verbatim}
+#include <queso/Environment.h>
+
+int main(int argc, char ** argv)
+{
+  QUESO::FullEnvironment env(MPI_COMM_WORLD, argv[1], "",
+                             NULL);
+  return 0;
+}
+  \end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{The environment}
+  \begin{verbatim}
+QUESO::FullEnvironment env(MPI_COMM_WORLD, argv[1], "",
+                           NULL);
+  \end{verbatim}
+  Arguments:
+  \begin{enumerate}
+    \item \Mpi\ communitcator.
+    \item Path to \Queso\ input file.
+    \item Prefix string for entries in the input file.
+    \item Optional programatically provided input options.
+  \end{enumerate}
+\end{frame}
+
+\section{Task 1}
+\begin{frame}[fragile]{Task 1}
+  \begin{itemize}
+    \item Create a source file and instantiate a \texttt{FullEnvironment}.
+    \item Compile it, link it against \Queso\ and run it.
+    \item  Make sure there are no errors.
+    \item You might need an input file.  You can find one here:
+      \url{https://github.com/libqueso/queso/blob/dev/examples/template_example/template_example_input.txt}
+    \item We'll talk about the input file later.  For now you can take it for
+      granted.
+    \item This task should take less than five minutes.
+  \end{itemize}
+\end{frame}

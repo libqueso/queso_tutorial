@@ -1,0 +1,34 @@
+\section{Extras}
+\begin{frame}[fragile]{Some useful DRAM options}
+  \begin{itemize}
+    \item \texttt{ip\_mh\_putOutOfBoundsInChain}:  If true, can be wasteful in
+      high-dimensional bounded domains.
+    \item \texttt{ip\_mh\_doLogitTransform}:  Transforms bounded domain to
+      unbounded domain for efficiency in high dimensions.
+    \item \texttt{ip\_mh\_dr\_maxNumExtraStages}:  Number of DR stages to do.
+      Can improve mixing.  More stages requires more likelihood evaluations.
+    \item \texttt{ip\_mh\_dr\_listOfScalesForExtraStages}:  A list of inverse
+      scale factors to scale the proposal covariance matrix by in each DR
+      stage.
+    \item \texttt{ip\_mh\_am\_initialNonAdaptInterval}:  Number of iterations
+      to not adapt.
+    \item \texttt{ip\_mh\_am\_adaptInterval}:  The frequency at which to adapt
+      proposal covariance matrix (after initial non-adapt period is over).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Optimisation}
+  \begin{itemize}
+    \item \Queso\ can optimise, using deterministic optimisation tools in \Gsl,
+      to find the MAP estimator before sampling
+    \item Better than starting from a user-defined initial sample, or from a
+      realisation from the prior
+    \item Caveat:  not all problems are easily optimised
+    \item If no derivative provided, then finite differences are used
+    \item The default tweakable optimisation parameters are hardcoded.  There is
+      an open ticket to change this, but it needs work:
+      \url{https://github.com/libqueso/queso/pull/310}
+    \item To enable optimisation, call \texttt{seedWithMAPEstimator()} before
+      calling \texttt{solveWithBayesMetropolisHastings(\ldots)}.
+  \end{itemize}
+\end{frame}

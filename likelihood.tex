@@ -1,0 +1,165 @@
+\section{Likelihoods}
+\begin{frame}[fragile]{Likelihoods}
+  \begin{itemize}
+    \item We now know enough to define our own prior random variable.
+    \item For standard MCMC, we don't need \emph{realisations} from the
+      prior.  Only need \emph{pdf evaluations}.
+    \item Since all random variables in \Queso\ have a \texttt{pdf()} method,
+      that's what \Queso\ will use to evaluate the prior pdf when sampling.
+    \item Up next is the likelihood.
+    \item There are no out-of-the-box likelihoods in \Queso, because they need
+      the \emph{forward problem}!
+    \item We will write an example forward problem first, and then create a
+      likelihood function in \Queso\ to evaluate the forward problem.
+    \item Then we'll give the prior and likelihood to \Queso.
+    \item \Queso\ will then solve the Bayesian problem.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{General framework}
+  Model (usually a PDE): $\mathcal{G}(\theta)$ where $\theta$ are model
+  paramaters.
+  \linebreak
+  \linebreak
+  Observations:
+  \begin{equation*}
+    y = \mathcal{G}(\theta) + \eta, \quad \eta \sim \mathcal{N}(0, R)
+  \end{equation*}
+  Want:
+  \begin{align*}
+    p(\theta | y) &\propto p(y | \theta) p(\theta) \\
+    &\propto \exp \left( -\frac12 \| \mathcal{G}(\theta) - y \|^2_R \right)
+    \exp \left( -\frac12 \| \theta - \bar{\theta} \|^2 \right)
+  \end{align*}
+  \textbf{Note:} The last proportionality is only true for Gaussian noise and
+  Gaussian prior.
+\end{frame}
+
+\begin{frame}{What does MCMC look like?}
+  \begin{figure}[htp]
+    \tikzstyle{vertex}=[circle,minimum size=3pt,inner sep=0pt]
+    \begin{tikzpicture}[scale=1.0,y=\textwidth/2.0, x=\textwidth/8.0]
+      % axis
+      \draw (-4,0) -- coordinate (x axis mid) (4,0);
+      % plot
+      \draw[color=blue] plot[smooth] file{pdf.dat};
+      \foreach \pos / \name / \fra in {{(2,0)/a/1}, {(1.75,0)/b/1}, {(1.5,0)/c/2}, {(1.25, 0)/d/3},
+                        {(1,0)/e/4}, {(0.75,0)/f/5}, {(0.5,0)/g/6}, {(0.2,0)/h/7},
+                        {(0.4198968,0)/i/8}, {(1.89466061,0)/j/9}, {(-1.19766853,0)/k/10},
+                        {(-1.32317683,0)/l/11}, {(1.68164494,0)/m/12}, {(1.0415304,0)/n/13},
+                        {(-0.71843111,0)/o/14}, {(1.71829706,0)/p/15}, {(-0.31911559,0)/q/16},
+                        {(-0.4858966,0)/r/17}}
+      \node<\fra->[vertex,fill=red] (\name) at \pos{};
+      \foreach \source / \dest / \fr in {a/b/1, b/c/2, c/d/3, d/e/4, e/f/5, f/g/6, g/h/7, h/i/8, i/j/9, j/k/10, k/l/11,
+                                   l/m/12, m/n/13, n/o/14, o/p/15, p/q/16, q/r/17}
+      \draw<\fr>[red,->] (\source) .. controls +(0,-0.1) and +(0,-0.1) .. (\dest);
+      \phantom{\draw<18>[red,->] (a) .. controls +(0,-0.1) and +(0,-0.1) .. (b);}
+      \node<18-> (mean) at (-2.3, 0.75) {$\mathbb{E}(\theta | y ) \approx \frac{1}{N} \sum_{k=1}^{N} \theta_k$};
+      \path (0, 0) coordinate (origin);
+      \draw<18->[black,->, thick] (mean) .. controls (-2.5,0.2) and (0,0.2) .. (origin);
+    \end{tikzpicture}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{How to do MCMC?  Sampling $p(\theta | y)$}
+  \begin{itemize}
+  \item Idea: Construct $\{ \theta_k \}_{k = 1}^{\infty}$ cleverly such that
+    $\{ \theta_k \}_{k = 1}^{\infty} \sim p(\theta | y)$
+    \begin{enumerate}
+    \item Let $\theta_j$ be the `current' state in the sequence and construct a \textit{proposal}, $z \sim q(\theta_j, \cdot)$
+    \item<2-> \uncover<2->{Compute $\alpha(\theta_j, z) = 1 \wedge \frac{p(z |  y) q(z, \theta_j)}{p(\theta_j | y) q(\theta_j, z)}$}
+    \item<3-> \uncover<3->{
+        Let
+        \begin{gather*}
+          \theta_{j+1} =
+            \begin{cases}
+              \theta   & \mbox{with probability } \alpha(\theta_j, z) \\
+              \theta_j & \mbox{with probability } 1 - \alpha(\theta_j, z)
+            \end{cases}
+        \end{gather*}
+      }
+    \end{enumerate}
+  \item<4-> \uncover<4->{We can take $\theta_1$ to be a draw from $p(\theta)$}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Likelihoods}
+  \begin{itemize}
+    \item To create a custom likelihood, we will subclass \texttt{BaseScalarFunction}.
+    \item We will implement \texttt{lnValue} and \texttt{actualValue}.
+    \item Sublass like so:
+      \begin{verbatim}
+template<class V, class M>
+class Likelihood : public QUESO::BaseScalarFunction<V, M>
+{ \end{verbatim}
+    \item You can call your class whatever you want, but \texttt{Likelihood}
+      seemed like a good name.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Likelihoods}
+  \begin{itemize}
+    \item Implement the \emph{constructor}:
+      \begin{verbatim}
+Likelihood(const char * prefix,
+           const QUESO::VectorSet<V, M> & domain)
+  : QUESO::BaseScalarFunction<V, M>(prefix, domain)
+{
+// Setup here
+} \end{verbatim}
+    \item The constructor is called when you create an object of type
+      \texttt{Likelihood}.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Likelihoods}
+  \begin{itemize}
+    \item Implement the \emph{destructor}:
+      \begin{verbatim}
+virtual ~Likelihood(
+{
+  // Deconstruct here
+} \end{verbatim}
+    \item The destructor is called when your creates object of type
+      \texttt{Likelihood} goes out of scope.
+    \item Do all cleanup in the destructor.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Likelihoods}
+  \begin{itemize}
+    \item Implement the \texttt{lnValue} method:
+      \begin{verbatim}
+virtual double lnValue(const V & domainVector,
+  const V * domainDirection, V * gradVector,
+  M * hessianMatrix, V * hessianEffect) const
+{
+  double diff = G(domainVector[0]) - m_observations[0];
+  return -0.5 * diff * diff / (sigma * sigma);
+} \end{verbatim}
+    \item \texttt{lnValue} should return $\log$ of $p(\theta | y)$ at the point
+      $\theta =$ \texttt{domainVector}.
+    \item You also need to implement \texttt{actualValue} but you can just
+      return \texttt{std::exp(lnValue(...))}.
+  \end{itemize}
+\end{frame}
+
+\section{Task 4}
+\begin{frame}[fragile]{Task 4}
+  \begin{itemize}
+    \item We'll use an example forward model in Chemistry called the Massman
+      model:
+      \begin{equation*}
+        \mathcal{G}(D, \beta) = D T^{\beta}
+      \end{equation*}
+    \item Uncertain parameters are $\theta = (D, \beta)$.  Observations are
+      taken at $T = 313.7, 314.9, 375.2, 474.7, 481.0, 573.5, 671.1$
+    \item Observation vector is $y = (4603.50, 4638.15, 6302.27, 9505.89,
+      9755.11, 13239.08, 17431.02)$
+    \item Observational error is Gaussian and standard deviation is $10.0$.
+    \item Create your own likelihood for this forward problem.
+    \item Instantiate it.
+    \item Make sure you can evaluate it at a point in parameter space.
+    \item This task should talk less than thirty minutes.
+  \end{itemize}
+\end{frame}

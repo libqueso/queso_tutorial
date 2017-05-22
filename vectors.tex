@@ -1,0 +1,70 @@
+\section{Vectors}
+\begin{frame}[fragile]{Vectors}
+  \begin{itemize}
+    \item Vectors live in a vector space.
+    \item Most classes in \Queso\ are templated around vector implementation.
+    \item The default vector/matrix implementation is \Gsl.
+  \end{itemize}
+  \begin{verbatim}
+QUESO::VectorSpace<> paramSpace(env, "param_", 1, NULL);
+  \end{verbatim}
+  Arguments:
+  \begin{itemize}
+    \item The environment.
+    \item The prefix for input file items.
+    \item The dimension of the vector space.
+    \item A pointer to a \texttt{std:vector} of \texttt{std:string}s for naming
+      components of the vectors.  Good for `naming' parameters.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Vectors}
+  In \Queso\ \texttt{v0.53.x}, the following classes are equivalent:
+  \begin{verbatim}
+QUESO::VectorSpace<>
+QUESO::VectorSpace<QUESO::GslVector, QUESO::GslMatrix>
+  \end{verbatim}
+  \begin{itemize}
+    \item The default template type is
+      \texttt{QUESO::GslVector}/\texttt{QUESO::GslMatrix}.
+    \item The \Queso\ development team are working closely with the
+      \texttt{DAKOTA} team at Sandia to provide a wider range of
+      high-perfomance vector/matrix implementations in the 12--15 month
+      timeline.
+    \item If you really don't like \texttt{QUESO::} everywhere, you can
+      insert
+      \begin{verbatim}
+using namespace QUESO;
+      \end{verbatim}
+       in your code and remove all instances of \texttt{QUESO::} elsewhere.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Vectors}
+  This \texttt{zeroVector} method returns a \texttt{GslVector} object belonging
+  to the vector space with every component set to zero.
+  \begin{verbatim}
+paramSpace.zeroVector();
+  \end{verbatim}
+  Use the vector space to eke out the zero vector, then copy it.
+  \begin{verbatim}
+QUESO::GslVector myVector(paramSpace.zeroVector());
+  \end{verbatim}
+  Argument is another \texttt{GslVector} object.
+\end{frame}
+
+\begin{frame}[fragile]{Vectors}
+  Set element \texttt{3}:
+  \begin{verbatim}
+myVector[2] = 1.0;
+  \end{verbatim}
+  Get element \texttt{2}:
+  \begin{verbatim}
+double myElement = myVector[1];
+  \end{verbatim}
+  Set every element to \texttt{5.0}:
+  \begin{verbatim}
+myVector.cwSet(5.0);
+  \end{verbatim}
+  For other methods, see \url{http://libqueso.com/queso/html/a00129.html}
+\end{frame}

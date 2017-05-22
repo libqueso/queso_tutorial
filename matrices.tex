@@ -1,0 +1,56 @@
+\section{Matrices}
+\begin{frame}[fragile]{Matrices}
+  \begin{itemize}
+    \item All matrices are square.
+    \item Obviously not true, but most of the time we only care about square
+      (covariance) matrices.
+    \item You can create nonsquare matrices, but I doubt you will ever need
+      one in \Queso\ unless your forward problem needs it.
+    \item Matrices don't \emph{live} in the vector space, but they are defined
+      over it.
+    \item Use an existing \texttt{GslVector} to construct a square matrix with
+      compatible dimension.
+  \end{itemize}
+  \begin{verbatim}
+QUESO:GslMatrix myMatrix(myVector);
+  \end{verbatim}
+  \begin{itemize}
+    \item Creates diagonal matrix with element $(i, i)$ equal to
+      \texttt{myVector[i]}.
+    \item Argument is a \texttt{GslVector} object but could be another
+      \texttt{GslMatrix}, in which case the whole matrix is copied.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Matrices}
+  Set element $(3, 4)$:
+  \begin{verbatim}
+myMatrix(2, 3) = 1.0;
+  \end{verbatim}
+  Get element $(2, 3)$:
+  \begin{verbatim}
+double myElement = myMatrix(1, 2);
+  \end{verbatim}
+  \begin{itemize}
+    \item \Queso\ has methods that can factorise matrices in order to solve
+      linear systems.
+    \item Linear algebra all relies on \Gsl.
+    \item See above comment about ongoing work for high-performance
+      vector/matrix implementations.
+    \item For other methods, see
+      \url{http://libqueso.com/queso/html/a00127.html}
+  \end{itemize}
+\end{frame}
+
+\section{Task 2}
+\begin{frame}[fragile]{Task 2}
+  \begin{itemize}
+    \item Create a \texttt{GslVector}.
+    \item Create a \texttt{GslMatrix}.
+    \item Multiply the vector by the matrix.
+    \item Verify the result of the multiplication is correct.
+    \item If you complete this quickly, look at the documentation and play with
+      some of the other methods.
+    \item This task should take less than ten minutes.
+  \end{itemize}
+\end{frame}

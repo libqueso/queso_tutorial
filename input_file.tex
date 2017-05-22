@@ -1,0 +1,111 @@
+\section{The \Queso\ input file}
+\begin{frame}[fragile]{\Queso\ input file: Environment options}
+  \begin{itemize}
+    \item Already seen how to change number of chains with input file
+    \item Prefix stuff is here.  \texttt{env\_} is the default prefix is empty
+      for the \texttt{FullEnvironment}.  You can change it and the
+      input file options will need to be prefixed with the passed user prefix.
+    \item Some environment options:
+      \begin{itemize}
+        \item \texttt{env\_subDisplayFileName} is the place to \Queso\ will
+          put general diagnostic information
+        \item \texttt{env\_subDisplayAllowAll} toggles whether or not all
+          process can write output related to environment
+        \item \texttt{env\_subDisplayAllowedSet} if the above option is false,
+          this option allows you to specify a subset of processes that can
+          write output
+        \item \texttt{env\_seed} is a flag for setting random number generator
+          seed.  Set this to something negative if you want multiple concurrent
+          chains to produce distinct samples.  If nonzero, this is the seed
+          that is used for all chains.
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\Queso\ input file: Inverse problem options}
+  \begin{itemize}
+    \item Inverse problem options
+      \begin{itemize}
+        \item \texttt{ip\_computeSolution} is a boolean.  If false, no
+          computation of the inverse problem is done.  Useful for testing
+          setup.
+        \item \texttt{ip\_dataOutputFileName} is the output file for inverse
+          problem related information.
+        \item \texttt{ip\_dataOutputAllowedSet} similar to environment option,
+          but specific to inverse problem
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\Queso\ input file: Algorithm options}
+  \begin{itemize}
+    \item All DRAM options are documented as part of the
+      \texttt{MhOptionsValues} class
+      \begin{itemize}
+        \item \url{http://libqueso.com/queso/html/a00166.html}
+      \end{itemize}
+    \item Software documentation and usability is assessed by users
+    \item If there are any options (anywhere, not just DRAM) that are unclear
+      or undocumented feel free to open a new GitHub ticket
+    \item Better yet, write a patch to fix it and you can be a \Queso\
+      contributor!
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Programmatically setting options}
+  \begin{itemize}
+    \item You can set options programmatically instead of via the input file
+    \item Objects whose behaviour is tweakable will accept a pointer to an
+      instance of \texttt{*OptionsValues} in the constructor
+      \begin{itemize}
+        \item \texttt{FullEnvironment} takes an \texttt{EnvOptionsValues}
+          pointer: \url{http://libqueso.com/queso/html/a00081.html#a77081a9fd8cb7b90ee3c0da289d91815}
+        \item \texttt{StatisticalInverseProblem} takes an
+          \texttt{SipOptionsValues} pointer: \url{http://libqueso.com/queso/html/a00207.html#a98ad98a7030b2c6577a0e840506bf74d}
+        \item Options object member names are similar to input file option names
+      \end{itemize}
+    \item You needn't create a \texttt{MetropolisHastingsSG} object; the
+      inverse problem will create one for you
+    \item You can pass options via \texttt{solveWithBayesMetropolisHastings}:
+      \begin{itemize}
+        \item \url{http://libqueso.com/queso/html/a00207.html#a924189e647110129682308b9bffc3a0d}
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Thinning}
+  \begin{itemize}
+    \item A common way to try and improve decorrelation time is by thinning
+    \item Thinning is simply saving every $m$-th sample where $m > 1$
+    \item The \texttt{ip\_raw\_chain.m} contains the unthinned chain
+    \item To enable thinning, turn on this input file option:
+      \begin{itemize}
+        \item \texttt{ip\_mh\_filteredChain\_generate = 1}
+      \end{itemize}
+    \item With this option on, you must also set the value for $m$:
+      \begin{itemize}
+        \item \texttt{ip\_mh\_filteredChain\_lag = 2}
+      \end{itemize}
+    \item Somewhere to store the output:
+      \begin{itemize}
+        \item \texttt{ip\_mh\_filteredChain\_dataOutputFileName = outputData/ip\_filtered\_chain}
+      \end{itemize}
+    \item Let all processes write their output
+      \begin{itemize}
+        \item \texttt{ip\_mh\_filteredChain\_dataOutputAllowAll = 1}
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\section{Task 6}
+\begin{frame}[fragile]{Task 6}
+  \begin{itemize}
+    \item Enable thinning
+    \item Perhaps remove (or backup) the existing \texttt{outputData} directory
+    \item Run the code (perhaps with multiple chains in parallel)
+    \item Verify the length of the filtered chain is what you expect
+    \item Compute the running mean of the samples.  Does it converge faster
+      or slower?
+    \item This task should take less than twenty minutes.
+  \end{itemize}
+\end{frame}

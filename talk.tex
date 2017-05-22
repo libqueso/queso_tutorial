@@ -1,0 +1,97 @@
+\documentclass{beamer}
+\usetheme[secheader]{pecostalk}
+
+\usepackage{graphicx}
+\usepackage{parskip,amssymb,amsmath,amsthm,url}
+\usepackage{subfigure}
+\usepackage{esdiff}
+\usepackage{latexsym}
+\usepackage{verbatim}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{arrows,plotmarks}
+
+\graphicspath{{figs/}}
+
+\date[16/07/2015]{16th of July, 2015}
+\title{\Queso\ tutorial}
+\author[D. McDougall]{Damon McDougall}
+\institute{Centre for Predictive Engineering and Computational Sciences\\
+Institute for Computational Engineering and Sciences\\
+The University of Texas at Austin}
+
+\newcommand{\ud}{\,\mathrm{d}}
+\newcommand{\grad}{\nabla}
+\newcommand{\Var}{\mbox{Var}}
+\newcommand{\Cov}{\mbox{Cov}}
+\newcommand{\argmin}{\mbox{argmin}}
+\newcommand{\iid}{
+  \ensuremath{
+    \stackrel{\mbox{\scriptsize{i.i.d}}}{\sim}
+  }
+}
+
+\newcommand{\norm}[1]{
+  \ensuremath{\left\| #1 \right\|}
+}
+\newcommand{\Queso}{\texttt{QUESO}}
+\newcommand{\Mpi}{\texttt{MPI}}
+\newcommand{\Gsl}{\texttt{GSL}}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+  \begin{center}
+  \end{center}
+  \vspace{0.1in}
+  \begin{columns}
+  \begin{column}{0.33\linewidth}
+  \begin{flushleft}
+  \includegraphics[width=0.36\linewidth]{ICES-secondary-logo-crop}
+  \end{flushleft}
+  \end{column}
+  \begin{column}{0.33\linewidth}
+  \begin{center}
+  \includegraphics[scale=0.06]{circle-logo}
+  \end{center}
+  \end{column}
+  \begin{column}{0.33\linewidth}
+  \begin{flushright}
+  \includegraphics[scale=0.18]{asc_logo}
+  \end{flushright}
+  \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Outline}
+  \begin{enumerate}
+    \item History, design, and other software
+    \item Vectors and matrices
+    \item Generating random numbers
+    \item Defining a distribution
+    \item Implementing your likelihood
+    \item Defining the posterior
+    \item Analysing output
+    \item Assessing convergence
+    \item Contributing to \Queso
+    \item The future of \Queso
+  \end{enumerate}
+\end{frame}
+
+\input{intro}
+\input{environment}
+\input{vectors}
+\input{matrices}
+\input{domains}
+\input{random_variables}
+\input{likelihood}
+\input{sip}
+\input{output}
+\input{parallel}
+\input{input_file}
+\input{extras}
+\input{contributing}
+\input{future}
+
+\end{document}
